@@ -37,6 +37,10 @@ macOS-only. This tool relies on macOS Shortcuts and Notification Center.
   - Hammerspoon (HUD / idle / lock detection)
   - Pushover account (phone notifications)
 
+> [!TIP]
+> Hammerspoon is optional; if it is not installed, nrun will still work,
+> but HUD/modal alerts and idle/lock detection will be disabled.
+
 
 ### Installing dependencies with Homebrew
 
@@ -46,10 +50,6 @@ If you use Homebrew, you can install the required and optional dependencies with
 brew install jq
 brew install --cask hammerspoon
 ```
-
-> [!TIP]
-> >Hammerspoon is optional; if it is not installed, nrun will still work,
-> but HUD/modal alerts and idle/lock detection will be disabled.
 
 > [!NOTE]
 > Hammerspoon may prompt for Accessibility permissions on first run.

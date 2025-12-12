@@ -8,7 +8,7 @@ Shortcuts are used instead of AppleScript to ensure notifications behave correct
 - Banners (or Alerts) are shown immediately, without opening Notification Center
 - Notifications persist and are not dismissed automatically
 
-> ![Note]
+> [!NOTE]
 > The Shortcut instructions and screenshots were created on macOS Sequoia.
 > The Shortcuts UI may differ slightly on other macOS versions, but the overall
 > configuration should be the same.
