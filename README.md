@@ -6,9 +6,9 @@ It’s designed to be:
 - quiet for fast failures (fat-finger mistakes)
 - reliable for long jobs
 - persistent via macOS Notification Center
-- smart: escalate to your phone when you're away
+- smart: escalates to your phone when you're away
 
-`nrun` is intentionally **opinionated**, but configurable. 
+`nrun` is intentionally **opinionated**, but configurable where it matters.
 See [Notification Behavior](#notification-behavior-defaults) for details on when and how notifications are sent.
 
 > [!IMPORTANT]
@@ -34,7 +34,7 @@ See [Notification Behavior](#notification-behavior-defaults) for details on when
 
 - macOS
 - `bash` or `zsh`
-- `jq`
+- `jq` (used to safely construct notification payloads)
 - **Optional:**
   - [Hammerspoon](https://www.hammerspoon.org) (HUD / idle / lock detection)
   - [Pushover](https://pushover.net) account (phone notifications)
@@ -67,9 +67,8 @@ Clone the repo and put `nrun` somewhere on your `PATH`:
 git clone https://github.com/glucas/nrun.git
 cd nrun
 install -m 0755 nrun ~/.local/bin/nrun
+# or any directory already on your PATH
 ```
-
-Make sure `~/.local/bin` (or your preferred location) is on your `PATH`.
 
 ---
 
@@ -81,7 +80,7 @@ not dismissed immediately.
 
 ![Shell Notification Shortcut](docs/shortcut-v2.png)
 
-The Shortcut is intentionally simple and can be recreated manually.
+The Shortcut is intentionally simple and designed to be recreated manually.
 
 ➡️ **See [`docs/shortcut.md`](docs/shortcut.md) for full setup instructions,
 troubleshooting notes, and a sanity test.**
@@ -91,12 +90,7 @@ troubleshooting notes, and a sanity test.**
 ## Usage
 
 
-Show help and available options:
-
-```sh
-nrun --help
-
-```
+Run `nrun --help` to see all available options.
 
 Basic usage:
 
@@ -134,6 +128,8 @@ nrun --no-hud terraform apply
 
 ## Notification Behavior (Defaults)
 
+These defaults are chosen to avoid noise while still surfacing meaningful events.
+
 * **Fast failures** (default < 15s) are suppressed
 * **Successful or long-running jobs** trigger a macOS notification
 * **HUD / modal alerts** trigger after a configurable duration
@@ -166,8 +162,7 @@ NRUN_SECRETS_FILE="$HOME/.config/nrun/secrets"
 
 ## Pushover Setup (Optional)
 
-Pushover credentials are read `~/.config/nrun/secrets`. Override NRUN_SECRETS_FILE if you prefer a
-different location.
+Pushover credentials are read from `~/.config/nrun/secrets`. Override NRUN_SECRETS_FILE if you prefer a different location. If the file is missing or unreadable, phone notifications are silently skipped.
 
 Create a secrets file:
 
@@ -188,7 +183,7 @@ NRUN_PUSHOVER_USER_KEY="..."
 NRUN_PUSHOVER_APP_TOKEN="..."
 ```
 
-This file is sourced when `nrun` runs.
+The secrets file is sourced at runtime; ensure it is readable only by you.
 
 ---
 
@@ -199,6 +194,46 @@ This file is sourced when `nrun` runs.
 If a command finishes instantly, you’re probably watching it already.
 
 If it runs for minutes, you probably want to know when it finishes — even if you’ve walked away.
+
+---
+
+## Non-goals
+
+`nrun` is intentionally small and focused. The following are explicit non-goals:
+
+- Cross-platform support
+- Replacing shell history or job control
+- Fine-grained per-command notification rules
+
+---
+
+## FAQ
+
+### Why not `terminal-notifier` or `noti`?
+
+I started with that idea 🙂
+
+In practice, I ran into a few issues:
+
+- Notifications often only appeared reliably after opening Notification Center
+- Alerts could be dismissed immediately when Notification Center was opened
+- Behavior varied depending on Terminal app, shell, and notification settings
+- AppleScript-based notifications were increasingly unreliable
+
+Using a macOS Shortcut to deliver notifications via Notification Center turned out to be
+more reliable and consistent, especially for long-running jobs where I might have walked
+away from my machine.
+
+Once I added:
+- duration-aware suppression (fast failures)
+- escalation logic (HUD → Notification Center → phone)
+- idle / lock detection
+- optional phone notifications
+
+…it became clear this was more than a thin wrapper around an existing tool.
+
+If `terminal-notifier` works well for your use case, it’s still a perfectly reasonable choice.
+`nrun` exists to solve a slightly different set of problems.
 
 ---
 
