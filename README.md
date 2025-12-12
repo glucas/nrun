@@ -148,14 +148,14 @@ All thresholds are configurable via environment variables.
 Defaults (override via environment variables):
 
 ```sh
-NRUN_SUPPRESS_FAIL_LT=15
-NRUN_HUD_IF_LONGER=45
-NRUN_MODAL_ON_FAIL=1
-NRUN_PHONE_IF_LONGER=300
-NRUN_PHONE_IF_IDLE=120
-NRUN_PHONE_IF_LOCKED=1
-NRUN_SHORTCUT_NAME="Shell Notification"
-NRUN_SECRETS_FILE="$HOME/.config/nrun/secrets"
+NRUN_SUPPRESS_FAIL_LT=15        # Suppress notifications for failures faster than this (seconds)
+NRUN_HUD_IF_LONGER=45           # Show HUD / modal alerts if runtime exceeds this (seconds)
+NRUN_MODAL_ON_FAIL=1            # Use modal dialog instead of HUD on failure
+NRUN_PHONE_IF_LONGER=300        # Send phone notification if away and runtime exceeds this (seconds)
+NRUN_PHONE_IF_IDLE=120          # Consider machine "away" after this many idle seconds
+NRUN_PHONE_IF_LOCKED=1          # Consider machine "away" when screen is locked
+NRUN_SHORTCUT_NAME="Shell Notification"  # Name of the macOS Shortcut to invoke
+NRUN_SECRETS_FILE="$HOME/.config/nrun/secrets"  # Pushover credentials file
 ```
 
 ---
