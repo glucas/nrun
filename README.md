@@ -8,9 +8,12 @@ It’s designed to be:
 - persistent via macOS Notification Center
 - optionally escalated to your phone (Pushover)
 
-This is intentionally **opinionated**, but configurable.
+It is intentionally **opinionated**, but configurable.
+See [Notification Behavior](#notification-behavior-defaults) for details on when and how notifications are sent.
 
-macOS-only. This tool relies on macOS Shortcuts and Notification Center.
+> [!IMPORTANT]
+> macOS-only!
+> This tool relies on macOS Shortcuts and Notification Center.
 
 ---
 
