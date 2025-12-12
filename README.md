@@ -48,7 +48,7 @@ brew install --cask hammerspoon
 Hammerspoon is optional; if it is not installed, nrun will still work,
 but HUD/modal alerts and idle/lock detection will be disabled.
 
-> Note: Hammerspoon may prompt for Accessibility permissions on first run.
+> [!Note] Hammerspoon may prompt for Accessibility permissions on first run.
 > These are required for idle time and screen lock detection.
 
 ---
