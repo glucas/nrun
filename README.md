@@ -10,6 +10,8 @@ It’s designed to be:
 
 This is intentionally **opinionated**, but configurable.
 
+macOS-only. This tool relies on macOS Shortcuts and Notification Center.
+
 ---
 
 ## Features
@@ -62,7 +64,7 @@ git clone https://github.com/glucas/nrun.git
 cd nrun
 chmod +x nrun
 cp nrun ~/.local/bin/
-````
+```
 
 Make sure `~/.local/bin` is on your `PATH`.
 
@@ -70,9 +72,14 @@ Make sure `~/.local/bin` is on your `PATH`.
 
 ## macOS Shortcut Setup
 
-`nrun` sends notifications via a macOS Shortcut.
+This tool uses a macOS Shortcut to display notifications via Notification Center. Shortcuts are used
+instead of AppleScript to ensure notifications persist in Notification Center and are not dismissed
+immediately.
 
 ![Shell Notification Shortcut](docs/shortcut-v2.png)
+
+You can manually recreate this Shortcut using the steps below.
+A downloadable `.shortcut` file is **not** required or included.
 
 Create a Shortcut named (by default):
 
@@ -84,7 +91,8 @@ Shortcut actions (top to bottom):
 
 1. **Receive Text and Rich Text**
 
-   * If there’s no input: Continue (or Get Clipboard)
+   * From: Nowhere
+   * If there’s no input: Continue (or Get Clipboard, if you prefer)
 
 2. **Get Text from Shortcut Input**
 
@@ -105,6 +113,14 @@ export NRUN_SHORTCUT_NAME="Your Shortcut Name"
 ---
 
 ## Usage
+
+
+Show help and available options:
+
+```sh
+nrun --help
+
+```
 
 Basic usage:
 
@@ -167,11 +183,15 @@ NRUN_PHONE_IF_LONGER=300
 NRUN_PHONE_IF_IDLE=120
 NRUN_PHONE_IF_LOCKED=1
 NRUN_SHORTCUT_NAME="Shell Notification"
+NRUN_SECRETS_FILE="$HOME/.config/nrun/secrets"
 ```
 
 ---
 
 ## Pushover Setup (Optional)
+
+Pushover credentials are read `~/.config/nrun/secrets`. Override NRUN_SECRETS_FILE if you prefer a
+different location.
 
 Create a secrets file:
 
@@ -209,5 +229,3 @@ If it runs for minutes, you probably want to know when it finishes — even if y
 ## License
 
 MIT
-
-```
