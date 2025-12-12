@@ -1,6 +1,6 @@
 # nrun
 
-`nrun` is a small shell wrapper for running long-running commands and getting notified when they finish.
+`nrun` is a small standalone shell tool for running long-running commands and getting notified when they finish.
 
 It’s designed to be:
 - quiet for fast failures (fat-finger mistakes)
@@ -20,43 +20,43 @@ This is intentionally **opinionated**, but configurable.
 - Duration-aware escalation
 - Optional HUD / modal alerts via Hammerspoon
 - Idle / screen-lock aware escalation (optional)
+- Safe handling of multiline command output
 - No AppleScript
 - No temp files
-- Safe handling of multiline output
 
 ---
 
 ## Requirements
 
-- macOS (tested on Sequoia)
-- `zsh` or `bash`
+- macOS
+- `bash` or `zsh`
 - `jq`
 - **Optional:**
-  - Hammerspoon (for HUD / lock / idle detection)
-  - Pushover account (for phone notifications)
+  - Hammerspoon (HUD / idle / lock detection)
+  - Pushover account (phone notifications)
 
 ---
 
 ## Installation
 
-Clone or copy the script somewhere reasonable, e.g.:
+Clone the repo and put `nrun` somewhere on your `PATH`:
 
 ```sh
-mkdir -p ~/.config/nrun
-cp nrun.zsh ~/.config/nrun/nrun.zsh
-```
+git clone https://github.com/glucas/nrun.git
+cd nrun
+chmod +x nrun
+cp nrun ~/.local/bin/
+````
 
-Then source it from your shell config:
-
-```sh
-source ~/.config/nrun/nrun.zsh
-```
+Make sure `~/.local/bin` is on your `PATH`.
 
 ---
 
 ## macOS Shortcut Setup
 
 `nrun` sends notifications via a macOS Shortcut.
+
+![Shell Notification Shortcut](docs/shortcut.png)
 
 Create a Shortcut named (by default):
 
@@ -80,9 +80,7 @@ Shortcut actions (top to bottom):
    * Body → dictionary value for key `body`
    * Attachment → empty
 
-This shortcut receives JSON on stdin and displays a notification.
-
-You can change the shortcut name via:
+You can override the shortcut name via:
 
 ```sh
 export NRUN_SHORTCUT_NAME="Your Shortcut Name"
@@ -118,7 +116,7 @@ Force phone notification:
 nrun --phone sleep 600
 ```
 
-Disable local HUD/modal escalation:
+Disable local HUD / modal escalation:
 
 ```sh
 nrun --no-hud terraform apply
@@ -143,7 +141,7 @@ All thresholds are configurable via environment variables.
 
 ## Configuration
 
-Defaults (can be overridden):
+Defaults (override via environment variables):
 
 ```sh
 NRUN_SUPPRESS_FAIL_LT=15
@@ -201,3 +199,5 @@ If it runs for minutes, you probably want to know when it finishes — even if y
 ## License
 
 MIT
+
+```
