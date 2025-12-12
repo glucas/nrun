@@ -62,11 +62,10 @@ Clone the repo and put `nrun` somewhere on your `PATH`:
 ```sh
 git clone https://github.com/glucas/nrun.git
 cd nrun
-chmod +x nrun
-cp nrun ~/.local/bin/
+install -m 0755 nrun ~/.local/bin/nrun
 ```
 
-Make sure `~/.local/bin` is on your `PATH`.
+Make sure `~/.local/bin` (or your preferred location) is on your `PATH`.
 
 ---
 
