@@ -1,0 +1,188 @@
+#!/usr/bin/env bash
+# nrun: run a command and notify on completion (macOS Shortcuts + optional Pushover/Hammerspoon)
+
+set -u
+
+# ---------------- defaults (override via env) ----------------
+: "${NRUN_SHORTCUT_NAME:=Shell Notification}"
+
+: "${NRUN_SUPPRESS_FAIL_LT:=15}"   # seconds: suppress notifications for failures faster than this
+: "${NRUN_HUD_IF_LONGER:=45}"      # seconds: show HUD/modal if runtime >= this (0 disables)
+: "${NRUN_MODAL_ON_FAIL:=1}"       # 1 = modal on failure when HUD triggers
+
+: "${NRUN_PHONE_IF_LONGER:=300}"   # seconds: phone notify if away AND runtime >= this (0 disables)
+: "${NRUN_PHONE_IF_IDLE:=120}"     # seconds idle => away
+: "${NRUN_PHONE_IF_LOCKED:=1}"     # 1 = locked => away
+
+# secrets file (optional)
+: "${NRUN_SECRETS_FILE:=$HOME/.config/nrun/secrets}"
+
+# ---------------- helpers ----------------
+_nrun_load_secrets() {
+  # shellcheck disable=SC1090
+  if [[ -r "$NRUN_SECRETS_FILE" ]]; then
+    source "$NRUN_SECRETS_FILE"
+  fi
+}
+
+_nrun_fmt_secs() {
+  local s="$1"
+  if (( s < 60 )); then
+    printf '%ss' "$s"
+  else
+    printf '%sm%ss' $((s/60)) $((s%60))
+  fi
+}
+
+_nrun_shortcut_notify() {
+  local title="$1"
+  local body="$2"
+
+  command -v jq >/dev/null 2>&1 || return 0
+  command -v shortcuts >/dev/null 2>&1 || return 0
+
+  jq -Rn --arg title "$title" --arg body "$body" '{title:$title, body:$body}' \
+    | shortcuts run "$NRUN_SHORTCUT_NAME" >/dev/null 2>&1 || true
+}
+
+_nrun_pushover_notify() {
+  local title="$1"
+  local body="$2"
+
+  command -v curl >/dev/null 2>&1 || return 0
+  [[ -n "${NRUN_PUSHOVER_USER_KEY:-}" && -n "${NRUN_PUSHOVER_APP_TOKEN:-}" ]] || return 0
+
+  curl -fsS https://api.pushover.net/1/messages.json \
+    -d token="$NRUN_PUSHOVER_APP_TOKEN" \
+    -d user="$NRUN_PUSHOVER_USER_KEY" \
+    -d title="$title" \
+    -d message="$body" \
+    >/dev/null 2>&1 || true
+}
+
+_nrun_hs_alert() {
+  command -v hs >/dev/null 2>&1 || return 0
+  hs -c "hs.alert.show([[$1]], 8)" >/dev/null 2>&1 || true
+}
+
+_nrun_hs_modal() {
+  command -v hs >/dev/null 2>&1 || return 0
+  hs -c "hs.dialog.blockAlert([[$1]], [[$2]], 'OK')" >/dev/null 2>&1 || true
+}
+
+_nrun_is_away() {
+  # returns 0 if away, 1 if not away (fail-closed: if hs unavailable, treat as not away)
+  command -v hs >/dev/null 2>&1 || return 1
+
+  local locked idle
+  locked="$(hs -c 'print(nrun_is_locked())' 2>/dev/null || echo 0)"
+  idle="$(hs -c 'print(nrun_idle_seconds())' 2>/dev/null || echo 0)"
+
+  if (( NRUN_PHONE_IF_LOCKED )) && [[ "$locked" == "1" ]]; then
+    return 0
+  fi
+  if [[ "$idle" =~ ^[0-9]+$ ]] && (( idle >= NRUN_PHONE_IF_IDLE )); then
+    return 0
+  fi
+  return 1
+}
+
+_nrun_help() {
+  cat <<EOF
+Usage: nrun [options] -- <command...>
+       nrun [options] <command...>
+
+Options:
+  --title <str>   Notification title (default: Shell)
+  --phone         Force phone notification (Pushover)
+  --no-hud        Disable local HUD/modal escalation
+  --help, -h      Show this help
+
+Env defaults:
+  NRUN_SHORTCUT_NAME       (default: "Shell Notification")
+  NRUN_SECRETS_FILE        (default: ~/.config/nrun/secrets)
+  NRUN_SUPPRESS_FAIL_LT    (default: 15)
+  NRUN_HUD_IF_LONGER       (default: 45)
+  NRUN_MODAL_ON_FAIL       (default: 1)
+  NRUN_PHONE_IF_LONGER     (default: 300)
+  NRUN_PHONE_IF_IDLE       (default: 120)
+  NRUN_PHONE_IF_LOCKED     (default: 1)
+
+Notes:
+- macOS-only: uses Shortcuts for Notification Center.
+- Pushover keys can be provided via NRUN_SECRETS_FILE:
+    NRUN_PUSHOVER_USER_KEY="..."
+    NRUN_PUSHOVER_APP_TOKEN="..."
+EOF
+}
+
+# ---------------- main ----------------
+main() {
+  local title="Shell"
+  local force_phone=0
+  local no_hud=0
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --title) title="${2:-Shell}"; shift 2;;
+      --phone) force_phone=1; shift;;
+      --no-hud) no_hud=1; shift;;
+      --help|-h) _nrun_help; return 0;;
+      --) shift; break;;
+      *) break;;
+    esac
+  done
+
+  [[ $# -gt 0 ]] || { echo "nrun: missing command (try --help)" >&2; return 2; }
+
+  _nrun_load_secrets
+
+  local cmd="$*"
+  local start end dur dur_h exit_status summary
+
+  start="$(date +%s)"
+  "$@"
+  exit_status=$?
+  end="$(date +%s)"
+
+  dur=$(( end - start ))
+  dur_h="$(_nrun_fmt_secs "$dur")"
+  summary="exit $exit_status • $dur_h"
+
+  local suppress=0
+  if (( exit_status != 0 && dur < NRUN_SUPPRESS_FAIL_LT )); then
+    suppress=1
+  fi
+
+  local body
+  body="${cmd}"$'\n'"${summary}"
+
+  # Default: Shortcuts notification (unless quick-fail suppression)
+  if (( !suppress )); then
+    _nrun_shortcut_notify "$title" "$body"
+  fi
+
+  # Local escalation (HUD/modal)
+  if (( !no_hud && NRUN_HUD_IF_LONGER > 0 && dur >= NRUN_HUD_IF_LONGER )); then
+    if (( exit_status != 0 && NRUN_MODAL_ON_FAIL )); then
+      _nrun_hs_modal "$title failed" "$body"
+    else
+      _nrun_hs_alert "$title"$'\n'"$body"
+    fi
+  fi
+
+  # Remote escalation (phone)
+  if (( !suppress )); then
+    if (( force_phone )); then
+      _nrun_pushover_notify "$title" "$body"
+    else
+      if (( NRUN_PHONE_IF_LONGER > 0 && dur >= NRUN_PHONE_IF_LONGER )) && _nrun_is_away; then
+        _nrun_pushover_notify "$title" "$body"
+      fi
+    fi
+  fi
+
+  return "$exit_status"
+}
+
+main "$@"
