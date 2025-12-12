@@ -68,7 +68,7 @@ Shortcut actions (top to bottom):
 
 1. **Receive Text and Rich Text**
 
-   * If there’s no input: Continue
+   * If there’s no input: Continue (or Get Clipboard)
 
 2. **Get Text from Shortcut Input**
 
