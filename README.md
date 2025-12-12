@@ -35,6 +35,22 @@ This is intentionally **opinionated**, but configurable.
   - Hammerspoon (HUD / idle / lock detection)
   - Pushover account (phone notifications)
 
+
+### Installing dependencies with Homebrew
+
+If you use Homebrew, you can install the required and optional dependencies with:
+
+```sh
+brew install jq
+brew install --cask hammerspoon
+```
+
+Hammerspoon is optional; if it is not installed, nrun will still work,
+but HUD/modal alerts and idle/lock detection will be disabled.
+
+> Note: Hammerspoon may prompt for Accessibility permissions on first run.
+> These are required for idle time and screen lock detection.
+
 ---
 
 ## Installation
@@ -56,7 +72,7 @@ Make sure `~/.local/bin` is on your `PATH`.
 
 `nrun` sends notifications via a macOS Shortcut.
 
-![Shell Notification Shortcut](docs/shortcut.png)
+![Shell Notification Shortcut](docs/shortcut-v2.png)
 
 Create a Shortcut named (by default):
 
@@ -177,12 +193,6 @@ NRUN_PUSHOVER_APP_TOKEN="..."
 ```
 
 This file is sourced when `nrun` runs.
-
-Example `.gitignore` entry:
-
-```gitignore
-.config/nrun/secrets
-```
 
 ---
 
