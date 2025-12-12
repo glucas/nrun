@@ -6,14 +6,13 @@ It’s designed to be:
 - quiet for fast failures (fat-finger mistakes)
 - reliable for long jobs
 - persistent via macOS Notification Center
-- optionally escalated to your phone (Pushover)
+- smart: escalate to your phone when you're away
 
-It is intentionally **opinionated**, but configurable.
+`nrun` is intentionally **opinionated**, but configurable. 
 See [Notification Behavior](#notification-behavior-defaults) for details on when and how notifications are sent.
 
 > [!IMPORTANT]
-> macOS-only!
-> This tool relies on macOS Shortcuts and Notification Center.
+> macOS-only: This tool relies on macOS Shortcuts and Notification Center.
 
 ---
 
@@ -37,8 +36,8 @@ See [Notification Behavior](#notification-behavior-defaults) for details on when
 - `bash` or `zsh`
 - `jq`
 - **Optional:**
-  - Hammerspoon (HUD / idle / lock detection)
-  - Pushover account (phone notifications)
+  - [Hammerspoon](https://www.hammerspoon.org) (HUD / idle / lock detection)
+  - [Pushover](https://pushover.net) account (phone notifications)
 
 > [!TIP]
 > Hammerspoon is optional; if it is not installed, nrun will still work,
