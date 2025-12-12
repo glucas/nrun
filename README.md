@@ -86,12 +86,12 @@ Create a Shortcut named (by default):
 Shell Notification
 ```
 
-Shortcut actions (top to bottom):
+### Shortcut actions (top to bottom)
 
 1. **Receive Text and Rich Text**
 
-   * From: Nowhere
-   * If there’s no input: Continue (or Get Clipboard, if you prefer)
+   * From: **Nowhere**
+   * If there’s no input: **Continue** (or **Get Clipboard**, if you prefer)
 
 2. **Get Text from Shortcut Input**
 
@@ -108,6 +108,35 @@ You can override the shortcut name via:
 ```sh
 export NRUN_SHORTCUT_NAME="Your Shortcut Name"
 ```
+
+---
+
+### If you don’t see the “Receive Text and Rich Text” block
+
+On some macOS versions, the “Receive … input” header does not appear until the Shortcut is
+temporarily enabled as a Quick Action.
+
+If you can’t find or add the Receive block:
+
+1. Open the Shortcut’s info panel (ⓘ).
+2. Enable **Use as Quick Action** (and enable **Finder** if prompted).
+3. Return to the editor; the “Receive” block should now be available.
+4. After adding and configuring the Receive block, you may disable Finder again if desired.
+
+`nrun` sends input to the Shortcut via **stdin**, so it works reliably even when the Shortcut
+receives input from “Nowhere”.
+
+---
+
+### Sanity test
+
+Before using `nrun`, you can verify the Shortcut works on its own:
+
+```sh
+shortcuts run "Shell Notification" <<< '{"title":"Test","body":"Hello"}'
+```
+
+You should see a Notification Center banner with title **Test** and body **Hello**.
 
 ---
 
