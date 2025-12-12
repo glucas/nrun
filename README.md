@@ -47,10 +47,12 @@ brew install jq
 brew install --cask hammerspoon
 ```
 
-Hammerspoon is optional; if it is not installed, nrun will still work,
-but HUD/modal alerts and idle/lock detection will be disabled.
+> [!TIP]
+> >Hammerspoon is optional; if it is not installed, nrun will still work,
+> but HUD/modal alerts and idle/lock detection will be disabled.
 
-> [!Note] Hammerspoon may prompt for Accessibility permissions on first run.
+> [!NOTE]
+> Hammerspoon may prompt for Accessibility permissions on first run.
 > These are required for idle time and screen lock detection.
 
 ---
@@ -71,72 +73,16 @@ Make sure `~/.local/bin` (or your preferred location) is on your `PATH`.
 
 ## macOS Shortcut Setup
 
-This tool uses a macOS Shortcut to display notifications via Notification Center. Shortcuts are used
-instead of AppleScript to ensure notifications persist in Notification Center and are not dismissed
-immediately.
+`nrun` uses a macOS Shortcut to display notifications via Notification Center.
+Shortcuts are used instead of AppleScript to ensure notifications persist and are
+not dismissed immediately.
 
 ![Shell Notification Shortcut](docs/shortcut-v2.png)
 
-You can manually recreate this Shortcut using the steps below.
-A downloadable `.shortcut` file is **not** required or included.
+The Shortcut is intentionally simple and can be recreated manually.
 
-Create a Shortcut named (by default):
-
-```
-Shell Notification
-```
-
-### Shortcut actions (top to bottom)
-
-1. **Receive Text and Rich Text**
-
-   * From: **Nowhere**
-   * If there’s no input: **Continue** (or **Get Clipboard**, if you prefer)
-
-2. **Get Text from Shortcut Input**
-
-3. **Get Dictionary from Input**
-
-4. **Show Notification**
-
-   * Title → dictionary value for key `title`
-   * Body → dictionary value for key `body`
-   * Attachment → empty
-
-You can override the shortcut name via:
-
-```sh
-export NRUN_SHORTCUT_NAME="Your Shortcut Name"
-```
-
----
-
-### If you don’t see the “Receive Text and Rich Text” block
-
-On some macOS versions, the “Receive … input” header does not appear until the Shortcut is
-temporarily enabled as a Quick Action.
-
-If you can’t find or add the Receive block:
-
-1. Open the Shortcut’s info panel (ⓘ).
-2. Enable **Use as Quick Action** (and enable **Finder** if prompted).
-3. Return to the editor; the “Receive” block should now be available.
-4. After adding and configuring the Receive block, you may disable Finder again if desired.
-
-`nrun` sends input to the Shortcut via **stdin**, so it works reliably even when the Shortcut
-receives input from “Nowhere”.
-
----
-
-### Sanity test
-
-Before using `nrun`, you can verify the Shortcut works on its own:
-
-```sh
-shortcuts run "Shell Notification" <<< '{"title":"Test","body":"Hello"}'
-```
-
-You should see a Notification Center banner with title **Test** and body **Hello**.
+➡️ **See [`docs/shortcut.md`](docs/shortcut.md) for full setup instructions,
+troubleshooting notes, and a sanity test.**
 
 ---
 
